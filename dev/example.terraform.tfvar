@@ -1,0 +1,8 @@
+region           = 
+env              = 
+tf_bucket_name   = 
+tf_bucket_region = 
+aws_access_key   = 
+aws_secret_key   = 
+project_name     = 
+vpc_cidr         = 
