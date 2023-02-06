@@ -31,3 +31,20 @@ module "load_balancer" {
     module.vpc
   ]
 }
+
+module "elasticbeanstalk" {
+  source                     = "./modules/elasticbeanstalk"
+  env                        = var.env
+  project_name               = var.project_name
+  private_subnet_cidr_blocks = module.vpc.private_subnet_list
+  vpc_id                     = module.vpc.vpc_id
+  shared_alb_arn             = module.load_balancer.shared_alb_arn
+  shared_alb_sg              = module.security_group.alb_sg
+  eb_ec2_sg                  = module.security_group.eb_ec2_sg
+
+  depends_on = [
+    module.load_balancer,
+    module.vpc,
+    module.security_group
+  ]
+}
