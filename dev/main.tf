@@ -26,9 +26,12 @@ module "load_balancer" {
   public_subnet_cidr_blocks = module.vpc.public_subnet_list
   vpc_id                    = module.vpc.vpc_id
   alb_sg                    = module.security_group.alb_sg
+  certificate_arn           = module.certificates.certificate_arn
+
   depends_on = [
     module.security_group,
-    module.vpc
+    module.vpc,
+    module.certificates
   ]
 }
 
@@ -45,6 +48,15 @@ module "elasticbeanstalk" {
   depends_on = [
     module.load_balancer,
     module.vpc,
-    module.security_group
+    module.security_group,
+    module.certificates
   ]
+}
+
+module "certificates" {
+  source       = "./modules/certificates"
+  env          = var.env
+  project_name = var.project_name
+  domain_name  = var.domain_name
+  zone_name    = var.zone_name
 }
