@@ -43,3 +43,14 @@ variable "region" {
 
 ##########################################################
 
+#Certificates
+variable "domain_name" {
+  type        = string
+  description = "Name of the domain for the certificates"
+}
+
+variable "zone_name" {
+  type        = string
+  description = "Name of the hosted zone."
+}
+
