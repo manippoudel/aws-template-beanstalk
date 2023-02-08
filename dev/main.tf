@@ -54,9 +54,27 @@ module "elasticbeanstalk" {
 }
 
 module "certificates" {
-  source       = "./modules/certificates"
-  env          = var.env
-  project_name = var.project_name
-  domain_name  = var.domain_name
-  zone_name    = var.zone_name
+  source                    = "./modules/certificates"
+  env                       = var.env
+  project_name              = var.project_name
+  domain_name               = var.domain_name
+  zone_name                 = var.zone_name
+  subject_alternative_names = var.subject_alternative_names
+}
+
+module "route53" {
+  source              = "./modules/route53"
+  env                 = var.env
+  project_name        = var.project_name
+  route53_zone_id     = module.certificates.route53_zone_id
+  route53_name        = module.certificates.route53_name
+  shared_alb_zone_id  = module.load_balancer.shared_alb_zone_id
+  shared_alb_dns_name = module.load_balancer.shared_alb_dns_name
+  domains_list         = var.subject_alternative_names
+  depends_on = [
+    module.load_balancer,
+    module.vpc,
+    module.security_group,
+    module.certificates
+  ]
 }
