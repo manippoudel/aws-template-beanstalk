@@ -54,3 +54,7 @@ variable "zone_name" {
   description = "Name of the hosted zone."
 }
 
+variable "subject_alternative_names" {
+  type = list(string)
+  description = "Alternative names for the domains."
+}
