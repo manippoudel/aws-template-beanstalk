@@ -19,62 +19,74 @@ module "security_group" {
   ]
 }
 
-module "load_balancer" {
-  source                    = "./modules/load_balancer"
-  env                       = var.env
-  project_name              = var.project_name
-  public_subnet_cidr_blocks = module.vpc.public_subnet_list
-  vpc_id                    = module.vpc.vpc_id
-  alb_sg                    = module.security_group.alb_sg
-  certificate_arn           = module.certificates.certificate_arn
+# module "load_balancer" {
+#   source                    = "./modules/load_balancer"
+#   env                       = var.env
+#   project_name              = var.project_name
+#   public_subnet_cidr_blocks = module.vpc.public_subnet_list
+#   vpc_id                    = module.vpc.vpc_id
+#   alb_sg                    = module.security_group.alb_sg
+#   certificate_arn           = module.certificates.certificate_arn
 
+#   depends_on = [
+#     module.security_group,
+#     module.vpc,
+#     module.certificates
+#   ]
+# }
+
+# module "elasticbeanstalk" {
+#   source                     = "./modules/elasticbeanstalk"
+#   env                        = var.env
+#   project_name               = var.project_name
+#   private_subnet_cidr_blocks = module.vpc.private_subnet_list
+#   vpc_id                     = module.vpc.vpc_id
+#   shared_alb_arn             = module.load_balancer.shared_alb_arn
+#   shared_alb_sg              = module.security_group.alb_sg
+#   eb_ec2_sg                  = module.security_group.eb_ec2_sg
+
+#   depends_on = [
+#     module.load_balancer,
+#     module.vpc,
+#     module.security_group,
+#     module.certificates
+#   ]
+# }
+
+# module "certificates" {
+#   source                    = "./modules/certificates"
+#   env                       = var.env
+#   project_name              = var.project_name
+#   domain_name               = var.domain_name
+#   zone_name                 = var.zone_name
+#   subject_alternative_names = var.subject_alternative_names
+# }
+
+# module "route53" {
+#   source              = "./modules/route53"
+#   env                 = var.env
+#   project_name        = var.project_name
+#   route53_zone_id     = module.certificates.route53_zone_id
+#   route53_name        = module.certificates.route53_name
+#   shared_alb_zone_id  = module.load_balancer.shared_alb_zone_id
+#   shared_alb_dns_name = module.load_balancer.shared_alb_dns_name
+#   domains_list        = var.subject_alternative_names
+#   depends_on = [
+#     module.load_balancer,
+#     module.vpc,
+#     module.security_group,
+#     module.certificates
+#   ]
+# }
+
+module "database" {
+  source                 = "./modules/database"
+  env                    = var.env
+  project_name           = var.project_name
+  aws_db_subnet_group_id = module.vpc.rds_subnet_group_id
+  rds_sg_id              = module.security_group.rds_sg_id
   depends_on = [
-    module.security_group,
-    module.vpc,
-    module.certificates
+    module.vpc
   ]
 }
 
-module "elasticbeanstalk" {
-  source                     = "./modules/elasticbeanstalk"
-  env                        = var.env
-  project_name               = var.project_name
-  private_subnet_cidr_blocks = module.vpc.private_subnet_list
-  vpc_id                     = module.vpc.vpc_id
-  shared_alb_arn             = module.load_balancer.shared_alb_arn
-  shared_alb_sg              = module.security_group.alb_sg
-  eb_ec2_sg                  = module.security_group.eb_ec2_sg
-
-  depends_on = [
-    module.load_balancer,
-    module.vpc,
-    module.security_group,
-    module.certificates
-  ]
-}
-
-module "certificates" {
-  source                    = "./modules/certificates"
-  env                       = var.env
-  project_name              = var.project_name
-  domain_name               = var.domain_name
-  zone_name                 = var.zone_name
-  subject_alternative_names = var.subject_alternative_names
-}
-
-module "route53" {
-  source              = "./modules/route53"
-  env                 = var.env
-  project_name        = var.project_name
-  route53_zone_id     = module.certificates.route53_zone_id
-  route53_name        = module.certificates.route53_name
-  shared_alb_zone_id  = module.load_balancer.shared_alb_zone_id
-  shared_alb_dns_name = module.load_balancer.shared_alb_dns_name
-  domains_list         = var.subject_alternative_names
-  depends_on = [
-    module.load_balancer,
-    module.vpc,
-    module.security_group,
-    module.certificates
-  ]
-}
